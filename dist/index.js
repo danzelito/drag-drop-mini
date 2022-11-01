@@ -27,7 +27,7 @@ class State {
     }
 }
 const projectState = State.getInstance();
-class Project {
+class Input {
     constructor() {
         this.templateElem = (document.querySelector('#project'));
         this.renderElem = document.querySelector('#app');
@@ -51,6 +51,8 @@ class Project {
                 this.descElem.value,
                 +this.peopleElem.value,
             ];
+            const [title, description, people] = userInput;
+            projectState.addProject(title, description, people);
             this.titleElem.value = '';
             this.descElem.value = '';
             this.peopleElem.value = '';
@@ -71,7 +73,7 @@ class List {
             this.projectsRender();
         });
         this.attach();
-        this.renderContext();
+        this.contentRender();
     }
     projectsRender() {
         const listEl = (document.getElementById(`${this.type}-projects-list`));
@@ -84,7 +86,7 @@ class List {
     attach() {
         this.renderElem.insertAdjacentElement('beforeend', this.sectionElem);
     }
-    renderContext() {
+    contentRender() {
         const listId = `${this.type}-projects-list`;
         const ul = this.sectionElem.querySelector('ul');
         ul.id = listId;
@@ -92,6 +94,7 @@ class List {
         h2.textContent = `${this.type.toUpperCase()} PROJECTS`;
     }
 }
-const project = new Project();
+const project = new Input();
 const activeList = new List('active');
 const finishedList = new List('finished');
+console.group(projectState);

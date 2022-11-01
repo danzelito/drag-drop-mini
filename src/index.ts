@@ -22,6 +22,7 @@ class State {
       description,
       people,
     };
+
     this.projects.push(newProject);
     for (const listenerFn of this.listeners) {
       listenerFn(this.projects.slice());
@@ -31,7 +32,7 @@ class State {
 
 const projectState = State.getInstance();
 
-class Project {
+class Input {
   templateElem: HTMLTemplateElement;
   renderElem: HTMLDivElement;
   formElem: HTMLFormElement;
@@ -78,6 +79,8 @@ class Project {
         this.descElem.value,
         +this.peopleElem.value,
       ];
+      const [title, description, people] = userInput;
+      projectState.addProject(title, description, people);
       this.titleElem.value = '';
       this.descElem.value = '';
       this.peopleElem.value = '';
@@ -97,6 +100,7 @@ class List {
   constructor(type: ActiveOrFinished) {
     this.type = type;
     this.assignedProjects = [];
+
     this.templateElem = <HTMLTemplateElement>(
       document.querySelector('#list')
     );
@@ -108,12 +112,14 @@ class List {
     );
     this.sectionElem = <HTMLElement>imported.firstElementChild;
     this.sectionElem.id = `${this.type}-projects`;
+
     projectState.addListener((projects: any[]) => {
       this.assignedProjects = projects;
       this.projectsRender();
     });
+
     this.attach();
-    this.renderContext();
+    this.contentRender();
   }
 
   private projectsRender() {
@@ -134,7 +140,7 @@ class List {
     );
   }
 
-  private renderContext() {
+  private contentRender() {
     const listId = `${this.type}-projects-list`;
     const ul = <HTMLUListElement>this.sectionElem.querySelector('ul');
     ul.id = listId;
@@ -145,6 +151,7 @@ class List {
   }
 }
 
-const project = new Project();
+const project = new Input();
 const activeList = new List('active');
 const finishedList = new List('finished');
+console.group(projectState);
