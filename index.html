@@ -35,7 +35,7 @@
       </form>
     </template>
     <template id="single">
-      <li>
+      <li draggable="true">
         <h2></h2>
         <h3></h3>
         <p></p>
@@ -50,6 +50,53 @@
       </section>
     </template>
     <div id="app"></div>
+    <template class="drop-container">
+      <p id="p1" draggable="true">This element is draggable</p>
+      <p
+        id="p2"
+        ondrop="drop_handler(event)"
+        ondragover="dragover_handler(event)"
+      >
+        This element is droppable
+      </p>
+    </template>
     <script src="dist/index.js"></script>
+    <!-- <script>
+      function dragstart_handler(event) {
+        event.dataTransfer.setData('text/plain', event.target.id);
+        event.dataTransfer.setData(
+          'text/html',
+          event.target.outerHTML
+        );
+        event.dataTransfer.setData(
+          'text/uti-list',
+          event.target.ownerDocument.location.href
+        );
+        let img = new Image();
+        img.src = 'example.gif';
+        event.dataTransfer.setDragImage(img, 10, 10);
+        event.dataTransfer.dropEffect = 'move';
+        console.log(event.dataTransfer);
+      }
+
+      window.addEventListener('DOMContentLoaded', () => {
+        const element = document.getElementById('p1');
+        element.addEventListener('dragstart', dragstart_handler);
+        console.log(element);
+      });
+
+      function dragover_handler(event) {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'move';
+      }
+
+      function drop_handler(event) {
+        event.preventDefault();
+
+        const dropDiv = document.querySelector('.drop-container');
+        const data = event.dataTransfer.getData('text/plain');
+        event.target.appendChild(document.getElementById(data));
+      }
+    </script> -->
   </body>
 </html>
