@@ -87,9 +87,10 @@ class List extends Component {
         const listEl = (document.getElementById(`${this.type}-projects-list`));
         listEl.textContent = '';
         for (const project of this.assignedProjects) {
-            const listItem = document.createElement('li');
-            listItem.textContent = project.title;
-            listEl.appendChild(listItem);
+            // const listItem = document.createElement('li');
+            // listItem.textContent = project.title;
+            // listEl.appendChild(listItem);
+            new Item(this.element.querySelector('ul').id, project);
         }
     }
     contentRender() {
@@ -99,6 +100,28 @@ class List extends Component {
         const h2 = this.element.querySelector('h2');
         h2.textContent = `${this.type.toUpperCase()} PROJECTS`;
     }
+}
+class Item extends Component {
+    constructor(hostId, project) {
+        super('single', hostId, false, project.id);
+        this.project = project;
+        this.configure();
+        this.contentRender();
+    }
+    get persons() {
+        return this.project.people === 1
+            ? '1 person'
+            : `${this.project.people} persons`;
+    }
+    contentRender() {
+        this.element.querySelector('h2').textContent =
+            this.project.title;
+        this.element.querySelector('h3').textContent =
+            this.persons + ' assigned';
+        this.element.querySelector('p').textContent =
+            this.project.description;
+    }
+    configure() { }
 }
 var ProjectStatus;
 (function (ProjectStatus) {

@@ -149,9 +149,10 @@ class List extends Component<HTMLDivElement, HTMLElement> {
     );
     listEl.textContent = '';
     for (const project of this.assignedProjects) {
-      const listItem = document.createElement('li');
-      listItem.textContent = project.title;
-      listEl.appendChild(listItem);
+      // const listItem = document.createElement('li');
+      // listItem.textContent = project.title;
+      // listEl.appendChild(listItem);
+      new Item(this.element.querySelector('ul')!.id, project);
     }
   }
 
@@ -162,6 +163,34 @@ class List extends Component<HTMLDivElement, HTMLElement> {
     const h2 = <HTMLHeadingElement>this.element.querySelector('h2');
     h2.textContent = `${this.type.toUpperCase()} PROJECTS`;
   }
+}
+
+class Item extends Component<HTMLDivElement, HTMLLIElement> {
+  private project: Project;
+
+  constructor(hostId: string, project: Project) {
+    super('single', hostId, false, project.id);
+    this.project = project;
+
+    this.configure();
+    this.contentRender();
+  }
+
+  get persons() {
+    return this.project.people === 1
+      ? '1 person'
+      : `${this.project.people} persons`;
+  }
+
+  contentRender(): void {
+    this.element.querySelector('h2')!.textContent =
+      this.project.title;
+    this.element.querySelector('h3')!.textContent =
+      this.persons + ' assigned';
+    this.element.querySelector('p')!.textContent =
+      this.project.description;
+  }
+  configure() {}
 }
 
 enum ProjectStatus {
