@@ -1,7 +1,15 @@
 "use strict";
-class State {
+class ListenerState {
     constructor() {
         this.listeners = [];
+    }
+    addListener(listenerFn) {
+        this.listeners.push(listenerFn);
+    }
+}
+class State extends ListenerState {
+    constructor() {
+        super();
         this.projects = [];
     }
     static getInstance() {
@@ -9,9 +17,6 @@ class State {
             return this.instance;
         this.instance = new State();
         return this.instance;
-    }
-    addListener(listenerFn) {
-        this.listeners.push(listenerFn);
     }
     addProject(title, description, people) {
         const newProject = new Project(Math.random().toString(), title, description, people, ProjectStatus.Active);
@@ -22,24 +27,30 @@ class State {
     }
 }
 const projectState = State.getInstance();
-class Input {
+class Component {
+    constructor(templateId, renderElemId, insertAtStart, newElemId) {
+        this.templateElem = document.getElementById(templateId);
+        this.renderElem = document.getElementById(renderElemId);
+        const importedNode = document.importNode(this.templateElem.content, true);
+        this.element = importedNode.firstElementChild;
+        if (newElemId)
+            this.element.id = newElemId;
+        this.attach(insertAtStart);
+    }
+    attach(insert) {
+        this.renderElem.insertAdjacentElement(insert ? 'afterbegin' : 'beforeend', this.element);
+    }
+}
+class Input extends Component {
     constructor() {
-        this.templateElem = (document.querySelector('#project'));
-        this.renderElem = document.querySelector('#app');
-        const imported = document.importNode(this.templateElem.content, true);
-        this.formElem = imported.firstElementChild;
-        this.formElem.id = 'user-input';
-        this.titleElem = (this.formElem.querySelector('#title'));
-        this.descElem = (this.formElem.querySelector('#description'));
-        this.peopleElem = (this.formElem.querySelector('#people'));
-        this.attach();
-        this.config();
+        super('project', 'app', true, 'user-input');
+        this.titleElem = (this.element.querySelector('#title'));
+        this.descElem = (this.element.querySelector('#description'));
+        this.peopleElem = (this.element.querySelector('#people'));
+        this.configure();
     }
-    attach() {
-        this.renderElem.insertAdjacentElement('afterbegin', this.formElem);
-    }
-    config() {
-        this.formElem.addEventListener('submit', (e) => {
+    configure() {
+        this.element.addEventListener('submit', (e) => {
             e.preventDefault();
             let userInput = [
                 this.titleElem.value,
@@ -53,16 +64,17 @@ class Input {
             this.peopleElem.value = '';
         });
     }
+    contentRender() { }
 }
-class List {
+class List extends Component {
     constructor(type) {
+        super('list', 'app', false, `${type}-projects`);
         this.type = type;
         this.assignedProjects = [];
-        this.templateElem = (document.querySelector('#list'));
-        this.renderElem = document.querySelector('#app');
-        const imported = document.importNode(this.templateElem.content, true);
-        this.sectionElem = imported.firstElementChild;
-        this.sectionElem.id = `${this.type}-projects`;
+        this.configure();
+        this.contentRender();
+    }
+    configure() {
         projectState.addListener((projects) => {
             const relevantProjects = projects.filter((project) => this.type === 'active'
                 ? project.status === ProjectStatus.Active
@@ -70,8 +82,6 @@ class List {
             this.assignedProjects = relevantProjects;
             this.projectsRender();
         });
-        this.attach();
-        this.contentRender();
     }
     projectsRender() {
         const listEl = (document.getElementById(`${this.type}-projects-list`));
@@ -82,14 +92,11 @@ class List {
             listEl.appendChild(listItem);
         }
     }
-    attach() {
-        this.renderElem.insertAdjacentElement('beforeend', this.sectionElem);
-    }
     contentRender() {
         const listId = `${this.type}-projects-list`;
-        const ul = this.sectionElem.querySelector('ul');
+        const ul = this.element.querySelector('ul');
         ul.id = listId;
-        const h2 = (this.sectionElem.querySelector('h2'));
+        const h2 = this.element.querySelector('h2');
         h2.textContent = `${this.type.toUpperCase()} PROJECTS`;
     }
 }
