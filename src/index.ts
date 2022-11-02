@@ -1,6 +1,8 @@
+type Listener = (items: Project[]) => void;
+
 class State {
-  private listeners: any[] = [];
-  private projects: any[] = [];
+  private listeners: Listener[] = [];
+  private projects: Project[] = [];
   private static instance: State;
 
   private constructor() {}
@@ -11,18 +13,18 @@ class State {
     return this.instance;
   }
 
-  addListener(listenerFn: Function) {
+  addListener(listenerFn: Listener) {
     this.listeners.push(listenerFn);
   }
 
   addProject(title: string, description: string, people: number) {
-    const newProject = {
-      id: Math.random().toString(),
+    const newProject = new Project(
+      Math.random().toString(),
       title,
       description,
       people,
-    };
-
+      ProjectStatus.Active
+    );
     this.projects.push(newProject);
     for (const listenerFn of this.listeners) {
       listenerFn(this.projects.slice());
@@ -94,7 +96,7 @@ class List {
   templateElem: HTMLTemplateElement;
   renderElem: HTMLDivElement;
   sectionElem: HTMLElement;
-  assignedProjects: any[];
+  assignedProjects: Project[];
   private type: ActiveOrFinished;
 
   constructor(type: ActiveOrFinished) {
@@ -113,8 +115,13 @@ class List {
     this.sectionElem = <HTMLElement>imported.firstElementChild;
     this.sectionElem.id = `${this.type}-projects`;
 
-    projectState.addListener((projects: any[]) => {
-      this.assignedProjects = projects;
+    projectState.addListener((projects: Project[]) => {
+      const relevantProjects = projects.filter((project) =>
+        this.type === 'active'
+          ? project.status === ProjectStatus.Active
+          : project.status === ProjectStatus.Finished
+      );
+      this.assignedProjects = relevantProjects;
       this.projectsRender();
     });
 
@@ -126,6 +133,7 @@ class List {
     const listEl = <HTMLUListElement>(
       document.getElementById(`${this.type}-projects-list`)
     );
+    listEl.textContent = '';
     for (const project of this.assignedProjects) {
       const listItem = document.createElement('li');
       listItem.textContent = project.title;
@@ -148,6 +156,32 @@ class List {
       this.sectionElem.querySelector('h2')
     );
     h2.textContent = `${this.type.toUpperCase()} PROJECTS`;
+  }
+}
+
+enum ProjectStatus {
+  Active,
+  Finished,
+}
+
+class Project {
+  id: string;
+  title: string;
+  description: string;
+  people: number;
+  status: ProjectStatus;
+  constructor(
+    id: string,
+    title: string,
+    description: string,
+    people: number,
+    status: ProjectStatus
+  ) {
+    this.id = id;
+    this.title = title;
+    this.description = description;
+    this.people = people;
+    this.status = status;
   }
 }
 
