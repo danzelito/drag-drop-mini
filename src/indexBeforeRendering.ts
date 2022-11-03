@@ -1,3 +1,29 @@
+enum ProjectStatus {
+  Active,
+  Finished,
+}
+
+class Project {
+  id: string;
+  title: string;
+  description: string;
+  people: number;
+  status: ProjectStatus;
+  constructor(
+    id: string,
+    title: string,
+    description: string,
+    people: number,
+    status: ProjectStatus
+  ) {
+    this.id = id;
+    this.title = title;
+    this.description = description;
+    this.people = people;
+    this.status = status;
+  }
+}
+
 type Listener = (items: Project[]) => void;
 
 class State {
@@ -25,6 +51,7 @@ class State {
       people,
       ProjectStatus.Active
     );
+
     this.projects.push(newProject);
     for (const listenerFn of this.listeners) {
       listenerFn(this.projects.slice());
@@ -34,46 +61,48 @@ class State {
 
 const projectState = State.getInstance();
 
-abstract class Component<
-  T extends HTMLElement,
-  U extends HTMLElement
-> {
-  templateElem: HTMLTemplateElement;
-  renderElem: T;
-  element: U;
+// abstract class Component<
+//   T extends HTMLElement,
+//   U extends HTMLElement
+// > {
+//   templateElem: HTMLTemplateElement;
+//   renderElem: T;
+//   element: U;
 
-  constructor(
-    templateId: string,
-    renderElemId: string,
-    insertAtStart: boolean,
-    newElemId?: string
-  ) {
-    this.templateElem = document.getElementById(
-      templateId
-    ) as HTMLTemplateElement;
+//   constructor(
+//     templateId: string,
+//     renderElemId: string,
+//     insertAtStart: boolean,
+//     newElemId?: string
+//   ) {
+//     this.templateElem = document.getElementById(
+//       templateId
+//     ) as HTMLTemplateElement;
 
-    this.renderElem = document.getElementById(renderElemId)! as T;
+//     this.renderElem = document.getElementById(renderElemId)! as T;
 
-    const importedNode = document.importNode(
-      this.templateElem.content,
-      true
-    );
+//     const importedNode = document.importNode(
+//       this.templateElem.content,
+//       true
+//     );
 
-    this.element = importedNode.firstElementChild as U;
-    if (newElemId) this.element.id = newElemId;
-    this.attach(insertAtStart);
-  }
+//     this.element = importedNode.firstElementChild as U;
+//     if (newElemId) this.element.id = newElemId;
+//     this.attach(insertAtStart);
+//   }
 
-  private attach(insert: boolean) {
-    this.renderElem.insertAdjacentElement(
-      insert ? 'afterbegin' : 'beforeend',
-      this.element
-    );
-  }
-  abstract configure(): void;
-  abstract contentRender(): void;
-}
+//   private attach(insert: boolean) {
+//     this.renderElem.insertAdjacentElement(
+//       insert ? 'afterbegin' : 'beforeend',
+//       this.element
+//     );
+//   }
+//   abstract configure(): void;
+//   abstract contentRender(): void;
+// }
 
+
+// RENDERING FORM
 class Input {
   templateElem: HTMLTemplateElement;
   renderElem: HTMLDivElement;
@@ -94,12 +123,15 @@ class Input {
     );
     this.formElem = <HTMLFormElement>imported.firstElementChild;
     this.formElem.id = 'user-input';
+
     this.titleElem = <HTMLInputElement>(
       this.formElem.querySelector('#title')
     );
+
     this.descElem = <HTMLInputElement>(
       this.formElem.querySelector('#description')
     );
+
     this.peopleElem = <HTMLInputElement>(
       this.formElem.querySelector('#people')
     );
@@ -145,6 +177,7 @@ class List {
     this.templateElem = document.querySelector(
       '#list'
     ) as HTMLTemplateElement;
+
     this.renderElem = document.querySelector(
       '#app'
     ) as HTMLDivElement;
@@ -199,33 +232,9 @@ class List {
   }
 }
 
-enum ProjectStatus {
-  Active,
-  Finished,
-}
 
-class Project {
-  id: string;
-  title: string;
-  description: string;
-  people: number;
-  status: ProjectStatus;
-  constructor(
-    id: string,
-    title: string,
-    description: string,
-    people: number,
-    status: ProjectStatus
-  ) {
-    this.id = id;
-    this.title = title;
-    this.description = description;
-    this.people = people;
-    this.status = status;
-  }
-}
 
 const project = new Input();
 const activeList = new List('active');
 const finishedList = new List('finished');
-console.group(projectState);
+

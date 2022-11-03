@@ -63,7 +63,6 @@ class Input extends Component {
     }
     configure() {
         this.element.addEventListener('submit', (e) => {
-            const hello = new Event('hello');
             e.preventDefault();
             let userInput = [
                 this.titleElem.value,
@@ -163,7 +162,7 @@ class Item extends Component {
         event.dataTransfer.setData('text/plain', this.project.id);
         event.dataTransfer.effectAllowed = 'move';
     }
-    dragEndHandler(event) {
+    dragEndHandler(_) {
         console.log('DragEnd');
     }
 }

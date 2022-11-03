@@ -116,7 +116,6 @@ class Input extends Component<HTMLDivElement, HTMLFormElement> {
 
   configure() {
     this.element.addEventListener('submit', (e) => {
-      const hello = new Event('hello');
       e.preventDefault();
       let userInput: [string, string, number] = [
         this.titleElem.value,
@@ -220,6 +219,17 @@ class List extends Component<HTMLDivElement, HTMLElement> {
   }
 }
 
+interface Draggable {
+  dragStartHandler(event: DragEvent): void;
+  dragEndHandler(event: DragEvent): void;
+}
+
+interface DragTarget {
+  dragOverHandler(event: DragEvent): void;
+  dropHandler(event: DragEvent): void;
+  dragLeaveHandler(event: DragEvent): void;
+}
+
 class Item
   extends Component<HTMLDivElement, HTMLLIElement>
   implements Draggable
@@ -264,21 +274,12 @@ class Item
     event.dataTransfer!.effectAllowed = 'move';
   }
 
-  dragEndHandler(event: DragEvent): void {
+  dragEndHandler(_: DragEvent): void {
     console.log('DragEnd');
   }
 }
 
-interface Draggable {
-  dragStartHandler(event: DragEvent): void;
-  dragEndHandler(event: DragEvent): void;
-}
 
-interface DragTarget {
-  dragOverHandler(event: DragEvent): void;
-  dropHandler(event: DragEvent): void;
-  dragLeaveHandler(event: DragEvent): void;
-}
 
 enum ProjectStatus {
   Active,
